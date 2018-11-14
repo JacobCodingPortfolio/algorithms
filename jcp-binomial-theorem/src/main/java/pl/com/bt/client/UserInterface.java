@@ -1,6 +1,7 @@
 package pl.com.bt.client;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +17,10 @@ public class UserInterface extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.stage = primaryStage;
+        this.stage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
         userInterface = this;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(FXML_FILE_NAME_PATH));
         Parent parent = fxmlLoader.load();
