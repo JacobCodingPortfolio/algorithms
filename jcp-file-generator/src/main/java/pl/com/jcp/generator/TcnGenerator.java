@@ -35,9 +35,18 @@ public class TcnGenerator {
             }
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileTxt));
             for(long i=0; i< numberCount; i++){
-                writer.write(String.valueOf(getRandomNumber()));
+                Integer firstNumber = getRandomNumber(this.numberRange);
+                Integer secondNumber = getRandomNumber(this.numberRange);
+
+                if(firstNumber < secondNumber){
+                    Integer buffer = firstNumber;
+                    firstNumber = secondNumber;
+                    secondNumber = buffer;
+                }
+
+                writer.write(String.valueOf(firstNumber));
                 writer.write(" ");
-                writer.write(String.valueOf(getRandomNumber()));
+                writer.write(String.valueOf(secondNumber));
                 writer.newLine();
             }
             writer.close();
@@ -47,8 +56,13 @@ public class TcnGenerator {
         }
     }
 
-    private Integer getRandomNumber(){
-        return Math.abs(random.nextInt()) % this.numberRange;
+    private Integer getRandomNumber(Integer numberRange){
+        Integer randomNumber = Math.abs(random.nextInt()) % numberRange;
+        if(randomNumber.equals(0)){
+            return getRandomNumber(numberRange);
+        } else {
+            return randomNumber;
+        }
     }
 
 

@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.com.bt.UserInterfaceController">
+<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.com.bt.client.UserInterfaceController">
    <children>
       <Button fx:id="buttonFileIn" layoutX="12.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#fileInClick" text="Choose localization file in.txt" />
       <Button fx:id="buttonDirOut" layoutX="12.0" layoutY="64.0" mnemonicParsing="false" onMouseClicked="#dirOutClick" text="Choose localization directory to save out.txt" />
@@ -15,6 +15,6 @@
       <Label layoutX="12.0" layoutY="173.0" prefHeight="17.0" prefWidth="376.0" text="Logs:" />
       <TextArea fx:id="textAreaLogs" layoutX="12.0" layoutY="190.0" prefHeight="196.0" prefWidth="376.0" />
       <Separator layoutX="12.0" layoutY="114.0" prefHeight="5.0" prefWidth="376.0" />
-      <Button fx:id="startAlgorithm" layoutX="12.0" layoutY="134.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="376.0" text="Start" onMouseClicked="#startAlgorithm"/>
+      <Button fx:id="startAlgorithm" disable="true" layoutX="12.0" layoutY="134.0" mnemonicParsing="false" onMouseClicked="#startAlgorithm" prefHeight="25.0" prefWidth="376.0" text="Start" />
    </children>
 </AnchorPane>
