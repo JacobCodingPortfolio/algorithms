@@ -1,6 +1,7 @@
-package pl.com.jcp;
+package pl.com.jcp.view;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,6 +12,9 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ParameterWindow extends AnchorPane{
@@ -22,31 +26,49 @@ public class ParameterWindow extends AnchorPane{
     private Button confirm;
     private Map<Parameter, String> parameterMap;
 
-    private ParameterWindow(){
+    private ParameterWindow(Window window, Parameter[] paramsExpected) throws Exception {
         this.loader = new FXMLLoader(getClass().getResource(POSITION_FXML_FILE_NAME_WINDOW));
         try {
-            this.mainContentWindow = this.loader.load();
+            this.mainContentWindow = this.getLoader().load();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.confirm = (Button) this.getNodeByKey("confirm");
-        this.confirm.setOnMouseClicked(event -> {
-
-            this.parameterStage.close();
-        });
-    }
-
-    public Map<Parameter, String> getParameters(Window window, Parameter[] paramsExptected) throws Exception {
-        ParameterWindow parameterWindow = new ParameterWindow();
-        for(Parameter p: paramsExptected){
-            final  ParameterPosition parameterPosition = new ParameterPosition(p);
-            parameterWindow.getChildren().add(parameterPosition);
-        }
         this.parameterStage = new Stage();
-        this.parameterStage.setScene(new Scene(parameterWindow));
         this.parameterStage.setTitle("Insert additional parameters");
         this.parameterStage.initOwner(window);
+        this.parameterStage.setResizable(false);
+        this.parameterStage.sizeToScene();
+
+        for(Parameter p: paramsExpected){
+            final  ParameterPosition parameterPosition = new ParameterPosition(p);
+            this.getMainContentWindow().getChildren().add(parameterPosition);
+        }
+
+        this.confirm = (Button) this.getNodeByKey("confirm");
+        this.getConfirm().setOnAction(event -> {
+            for(ParameterPosition position: this.getParametersPositions()){
+                if(parameterMap == null){
+                    parameterMap = new HashMap<>();
+                }
+                parameterMap.put(position.getParameter(), position.getParameterValue().getText());
+            }
+            this.parameterStage.close();
+        });
+
+        this.parameterStage.setOnCloseRequest(event -> {
+            this.parameterMap = null;
+        });
+
+        this.getChildren().add(this.mainContentWindow);
+        this.parameterStage.setScene(new Scene(this));
         this.parameterStage.showAndWait();
+    }
+
+    public static ParameterWindow getInstance(Window window, Parameter[] paramsExpected) throws Exception {
+        return new ParameterWindow(window, paramsExpected);
+    }
+
+    public Map<Parameter, String> getParameters() {
         return parameterMap;
     }
 
@@ -64,6 +86,19 @@ public class ParameterWindow extends AnchorPane{
 
     public Button getConfirm() {
         return confirm;
+    }
+
+    private List<ParameterPosition> getParametersPositions(){
+        List<ParameterPosition> parameterPositions = null;
+        for(Node node: this.getMainContentWindow().getChildren()){
+            if(node instanceof ParameterPosition){
+                if(parameterPositions == null){
+                    parameterPositions = new ArrayList<>();
+                }
+                parameterPositions.add((ParameterPosition) node);
+            }
+        }
+        return parameterPositions;
     }
 
     private class ParameterPosition extends AnchorPane{
@@ -88,7 +123,7 @@ public class ParameterWindow extends AnchorPane{
             }
             this.getChildren().add(this.positionContainer);
             parameterName = (Label) getNodeByKey("parameterName");
-            parameterName.setText(parameter.name().toUpperCase());
+            parameterName.setText(formatEnumName(parameter.name()));
             parameterValue = (TextField) getNodeByKey("parameterValue");
         }
 
@@ -96,34 +131,27 @@ public class ParameterWindow extends AnchorPane{
             return fxmlLoader.getNamespace().get(key);
         }
 
-        public Label getParameterName() {
-            return parameterName;
-        }
-
-        public void setParameterName(Label parameterName) {
-            this.parameterName = parameterName;
-        }
-
         public TextField getParameterValue() {
             return parameterValue;
-        }
-
-        public void setParameterValue(TextField parameterValue) {
-            this.parameterValue = parameterValue;
         }
 
         public Parameter getParameter() {
             return parameter;
         }
 
-        public void setParameter(Parameter parameter) {
-            this.parameter = parameter;
-        }
-
         @Override
         public boolean equals(Object obj) {
             ParameterPosition position = (ParameterPosition) obj;
             return this.parameter.equals(position.parameter);
+        }
+
+        private String formatEnumName(String name){
+            String formatName;
+            formatName = name;
+            formatName = formatName.toLowerCase();
+            formatName = formatName.replace("_", " ");
+            formatName = formatName.substring(0,1).toUpperCase() + formatName.substring(1).toLowerCase();
+            return formatName;
         }
     }
 }
