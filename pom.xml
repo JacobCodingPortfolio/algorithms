@@ -11,6 +11,7 @@
     <modules>
         <module>jcp-binomial-theorem</module>
         <module>jcp-file-generator</module>
+        <module>jcp-hanoi-tower</module>
     </modules>
 
 
