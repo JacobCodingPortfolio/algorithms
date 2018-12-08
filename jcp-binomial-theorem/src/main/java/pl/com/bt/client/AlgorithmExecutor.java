@@ -6,10 +6,7 @@ import pl.com.bt.algorithm.BinomialTheoremRecursively;
 import pl.com.bt.algorithm.BinomialTheoremSimplyIterate;
 import pl.com.bt.algorithm.StepCounter;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +17,7 @@ public class AlgorithmExecutor implements Runnable {
     private UserInterfaceController controller;
     private boolean execute = false;
     private boolean breakExecute = false;
+    private BufferedWriter bufferedWriter;
 
     private static final String GAP = "---------------------------------------------------------";
 
@@ -43,23 +41,37 @@ public class AlgorithmExecutor implements Runnable {
                 }
                 try {
 
+                    bufferedWriter = new BufferedWriter(new FileWriter(controller.getFileOut()));
                     binomialTheoremBasic = new BinomialTheoremBasic();
                     loggerInfo("Basic algorithm execution.");
+                    bufferedWriter.write("\nBasic algorithm execution. \n\n");
                     executeAlgorithm(binomialTheoremBasic, numbers);
-                    loggerInfo("For basic algorithm executions: " + String.valueOf(binomialTheoremBasic.getStepsTotality()) + "\n");
+                    loggerInfo("For basic algorithm executions: " + String.valueOf(binomialTheoremBasic.getStepsTotality()));
                     binomialTheoremRecursively = new BinomialTheoremRecursively();
                     loggerInfo("Recursively algorithm execution.");
+                    bufferedWriter.write("\nRecursively algorithm execution. \n\n");
                     executeAlgorithm(binomialTheoremRecursively, numbers);
-                    loggerInfo("For recursively algorithm executions: " + String.valueOf(binomialTheoremRecursively.getStepsTotality()) + "\n");
+                    loggerInfo("For recursively algorithm executions: " + String.valueOf(binomialTheoremRecursively.getStepsTotality()));
                     binomialTheoremSimplyIterate = new BinomialTheoremSimplyIterate();
                     loggerInfo("Simply iterate algorithm execution.");
+                    bufferedWriter.write("\nSimply iterate algorithm execution. \n\n");
                     executeAlgorithm(binomialTheoremSimplyIterate, numbers);
-                    loggerInfo("For simply iterate algorithm executions: " + String.valueOf(binomialTheoremSimplyIterate.getStepsTotality()) + "\n");
+                    bufferedWriter.write("\nFinish. \n");
+                    loggerInfo("For simply iterate algorithm executions: " + String.valueOf(binomialTheoremSimplyIterate.getStepsTotality()));
                     loggerCount("Done.");
 
                 } catch (StopExecute stopExecute){
                     loggerCount("Execution stopped.");
+                } catch (Exception e){
+                    e.printStackTrace();
                 } finally {
+                    if(bufferedWriter != null){
+                        try {
+                            bufferedWriter.close();
+                        } catch (IOException e) {
+                            loggerCount("Problem with closing writer.");
+                        }
+                    }
                     finishAction();
                 }
 
@@ -71,7 +83,12 @@ public class AlgorithmExecutor implements Runnable {
     private void executeAlgorithm(StepCounter stepCounter, List<Long[]> numbers) throws StopExecute {
         Long start = System.currentTimeMillis();
         for (Long[] longs: numbers){
-            stepCounter.calculate(longs[0], longs[1]);
+            Long result = stepCounter.calculate(longs[0], longs[1]);
+            try {
+                bufferedWriter.write("Numbers: " + String.valueOf(longs[0]) + ", " + String.valueOf(longs[1]) + "  Result: " + result.toString() + ", steps: " + String.valueOf(stepCounter.getStepsInOne()) + "\n");
+            } catch (IOException e) {
+                loggerCount("Problem with write.");
+            }
             loggerCount("Total step: " + String.valueOf(stepCounter.getStepsTotality()) + " Steps for current activity: " + String.valueOf(stepCounter.getStepsInOne()));
             if(breakExecute){
                 throw new StopExecute("Break execute");

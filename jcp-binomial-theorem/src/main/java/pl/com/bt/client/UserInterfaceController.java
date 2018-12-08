@@ -9,8 +9,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class UserInterfaceController {
 
@@ -34,6 +36,8 @@ public class UserInterfaceController {
 
     private File fileIn;
     private File dirOut;
+    private File fileOut;
+
 
     public void fileInClick(MouseEvent mouseEvent) {
         FileChooser chooser = new FileChooser();
@@ -48,7 +52,19 @@ public class UserInterfaceController {
         DirectoryChooser chooser = new DirectoryChooser();
         dirOut = chooser.showDialog(UserInterface.getUserInterface().getStage().getScene().getWindow());
         if(dirOut != null){
-            this.labelDirOutPath.setText("Directory name for output: " + fileIn.getName());
+            Random random = new Random();
+            Integer integer = Math.abs(random.nextInt());
+            String fileOutName = "out_" + integer.toString() + ".txt";
+            fileOut = new File(dirOut.getPath() + "/" + fileOutName);
+            if(!fileOut.exists()){
+                try {
+                    fileOut.createNewFile();
+                } catch (IOException e) {
+                    System.out.println("Problem tworzenia pliku.");
+                    return;
+                }
+            }
+            this.labelDirOutPath.setText("Generated out file: " + fileOutName);
         }
         checkPathSelected();
     }
@@ -119,4 +135,7 @@ public class UserInterfaceController {
         return dirOut;
     }
 
+    public File getFileOut() {
+        return fileOut;
+    }
 }

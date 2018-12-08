@@ -11,9 +11,8 @@ public class BinomialTheoremSimplyIterate extends StepCounter {
         for(long i=1; i<=k; i++){
             stepsInOne++;
             stepsTotality++;
-            wynik *= (n-i+1);
+            wynik = wynik * (n-i+1) / i;
         }
         return wynik;
     }
-
 }

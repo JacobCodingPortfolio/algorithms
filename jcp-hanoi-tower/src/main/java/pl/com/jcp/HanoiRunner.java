@@ -2,6 +2,8 @@ package pl.com.jcp;
 
 import javafx.application.Platform;
 
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HanoiRunner implements Runnable {
@@ -10,6 +12,8 @@ public class HanoiRunner implements Runnable {
     private HanoiController hanoiController;
     private boolean execute = false;
     private int totalSteps = 0;
+    private Integer numberOfPacks = null;
+    private BufferedWriter writer;
 
     public HanoiRunner(HanoiController hanoiController) {
         this.hanoiController = hanoiController;
@@ -17,16 +21,11 @@ public class HanoiRunner implements Runnable {
 
     @Override
     public void run() {
-        Integer numberOfPacks;
+
         while (true){
             if(execute) {
+                numberOfPacks = null;
                 startProcedure();
-                try {
-                    String s = hanoiController.getTextFieldPackCount().getText();
-                    numberOfPacks = Integer.valueOf(s);
-                } catch (Exception e) {
-                    numberOfPacks = 1;
-                }
                 this.hanoiExecute(numberOfPacks);
                 finishProcedure();
             }
@@ -35,12 +34,54 @@ public class HanoiRunner implements Runnable {
     }
 
     private void startProcedure() {
-        hanoiController.blockControls();
+
         Platform.runLater(() -> {
             this.hanoiController.logTotal(GAP);
             this.hanoiController.logTotal("Started on: " + String.valueOf(new Date()) + "\n");
             this.hanoiController.logTotal(GAP);
         });
+
+        BufferedReader reader = null;
+        if(hanoiController.getFileIn() != null){
+            try {
+                reader = new BufferedReader(new FileReader(hanoiController.getFileIn())); //Get the number from file
+                String s = reader.readLine();
+                numberOfPacks = Integer.valueOf(s);
+                File folderIn = hanoiController.getFileIn().getParentFile();
+                if(folderIn.isDirectory()){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+                    Date date = new Date();
+                    String fileOutName = "out_" + simpleDateFormat.format(date);
+                    File outFile = new File(folderIn.getPath() + "/" + fileOutName + ".txt");
+                    writer = new BufferedWriter(new FileWriter(outFile));
+                    Platform.runLater(() -> this.hanoiController.logTotal("Generated file out name: " + outFile.getName() + "\n"));
+                }
+            } catch (Exception e) {
+                numberOfPacks = null;
+            } finally {
+                if (reader != null){
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        System.out.println("Problem with closing reader.");
+                    }
+                }
+            }
+        }
+
+        if(numberOfPacks == null){
+            try {
+                String s = hanoiController.getTextFieldPackCount().getText();
+                numberOfPacks = Integer.valueOf(s);
+            } catch (Exception e) {
+                numberOfPacks = 1;
+            }
+            Platform.runLater(() -> this.hanoiController.logTotal("Number of pack get from text field.\n"));
+        } else {
+            Platform.runLater(() -> this.hanoiController.logTotal("Number of pack get from file.\n"));
+        }
+
+        hanoiController.blockControls();
     }
 
     private void finishProcedure() {
@@ -53,6 +94,13 @@ public class HanoiRunner implements Runnable {
             this.hanoiController.logTotal(GAP);
             this.hanoiController.logCount("");
         });
+        if(writer != null){
+            try {
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("Problem with closing writer.");
+            }
+        }
     }
 
     private void pause(){
@@ -84,12 +132,28 @@ public class HanoiRunner implements Runnable {
         if(packs == 1){
             this.addStep();
             pause();
-            Platform.runLater(() -> this.hanoiController.logTotal("Move from: " + start + " to: " + finish + "\n"));
+            move(start, finish);
         } else {
             this.hanoiAlgorithm(packs-1, start, finish, buffer);
             this.hanoiAlgorithm(1, start, buffer, finish);
             this.hanoiAlgorithm(packs-1, buffer, start, finish);
         }
+    }
+
+    private void move(String start, String finish) {
+        String move = "Move from: " + start + " to: " + finish;
+        if(writer != null){
+            try{
+                if (totalSteps > 1) {
+                    writer.newLine();
+                }
+                writer.write(move);
+            } catch (Exception e){
+                System.out.println("Problem with write to file.+");
+            }
+
+        }
+        Platform.runLater(() -> this.hanoiController.logTotal(move + "\n"));
     }
 
     private void addStep(){

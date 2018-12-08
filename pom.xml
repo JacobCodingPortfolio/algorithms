@@ -13,6 +13,9 @@
         <module>jcp-file-generator</module>
         <module>jcp-hanoi-tower</module>
         <module>jcp-substring-of-series</module>
+        <module>jcp-euclidean-algorithm</module>
+        <module>jcp-graph-algorithm</module>
+
     </modules>
 
 

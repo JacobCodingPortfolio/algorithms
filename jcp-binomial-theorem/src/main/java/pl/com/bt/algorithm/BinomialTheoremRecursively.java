@@ -12,7 +12,7 @@ public class BinomialTheoremRecursively extends StepCounter{
         if(k == 0 || k == n){
             return 1;
         } else {
-            return executeAlgorithm(n-1, k-1) + executeAlgorithm(n-1, k-1);
+            return executeAlgorithm(n-1, k-1) + executeAlgorithm(n-1, k);
         }
     }
 }

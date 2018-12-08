@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class GenStringFile {
 
-    private static final String FILE_SAVE_PATH = "C:/Users/jnartowicz/Desktop/Projekty Jakub/algorithms/jcp-substring-of-series/sub_strings.txt";
+    public static final String FILE_LOAD_PATH = "C:/Users/Jakub/Desktop/Programowanie/Projekty GitHub portfolio/algorithms/jcp-substring-of-series/sub_strings.txt";
     private static final int COUNT_OF_ROWS = 1000;
     private static final int COUNT_OF_STRING_IN_ROW = 2;
     private static final int FIRST_ASCII = 65;
@@ -17,7 +17,7 @@ public class GenStringFile {
     private static final int EXTENT_OF_COUNT_LETTER_STRING_END = 20;
 
     public static void main(String[] args) {
-        File file = new File(FILE_SAVE_PATH);
+        File file = new File(FILE_LOAD_PATH);
         if(!file.exists()){
             try {
                 file.createNewFile();
